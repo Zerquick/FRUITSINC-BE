@@ -1,0 +1,155 @@
+openapi: 3.0.3
+
+info:
+  title: Kwekker API
+  description: Interact with the Kwekker back-end
+  version: 1.1.0
+
+paths:
+  /kweks:
+    get:
+      summary: Get posted kweks
+      tags:
+        - kweks
+      parameters:
+        - in: query
+          name: username
+          description: Filter by username
+          schema: 
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                type: array
+                items:
+                  $ref: '#/components/schemas/kwek'
+    post:
+      summary: Post a new kwek
+      tags:
+        - kweks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/kwek'
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad request
+        '401':
+          description: Not authenticated
+  /kweks/{kwekId}:
+    put:
+      summary: Update an existing kwek
+      tags:
+        - kweks
+      parameters:
+        - in: path
+          name: kwekId
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/kwek'
+      responses:
+        '204':
+          description: No Content (updated successfully)
+        '400':
+          description: Bad request
+        '401':
+          description: Not authenticated
+        '403':
+          description: Not authorized
+        '404':
+          description: Not found
+    delete:
+      summary: Delete an existing kwek
+      tags:
+        - kweks
+      parameters:
+        - in: path
+          name: kwekId
+          schema:
+            type: integer
+          required: true
+      responses:
+        '204':
+          description: No Content (deleted successfully)
+        '401':
+          description: Not authenticated
+        '403':
+          description: Not authorized
+        '404':
+          description: Not found
+  /users/{username}:
+    get:
+      summary: Get user details
+      tags:
+        - users
+      parameters:
+        - in: path
+          name: username
+          schema:
+            type: string
+          required: true
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+        '404':
+          description: Not found
+components:
+  schemas:
+    kwek:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 6
+          readOnly: true
+        text:
+          type: string
+          minLength: 1
+          maxLength: 256
+          example: "Kwek kwek!"
+        user:
+          $ref: '#/components/schemas/user'
+        postedAt:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+        - id
+        - text
+        - user
+        - postedAt
+    user:
+      type: object
+      properties:
+        username:
+          type: string
+          example: Wickex
+        displayName:
+          type: string
+          example: Colin Pieper
+        avatarUrl:
+          type: string
+          format: uri
+          example: https://cdn.kwekker.com/avatars/foo.jpg
+      readOnly: true
+      required:
+        - username
+        - displayName
+        - avatarUrl
